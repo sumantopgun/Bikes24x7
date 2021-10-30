@@ -1,0 +1,414 @@
+@extends('frontend.layout')
+@section('title', 'Sell Bike')
+@push('style') 
+    <link rel="stylesheet" href="{{ asset('frontend_template/css/cart.css')}}">
+    <link href="{{ asset('frontend_template/css/contact.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('admin_template/node_modules/select2/dist/css/select2.min.css')}}" />
+    <link rel="stylesheet" href="{{ asset('admin_template/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.min.css')}}" />
+    <link rel="stylesheet" href="{{ asset('admin_template/node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')}}" />
+    <style>
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            float: left;
+        }
+        .errorShowModelName,.errorShowbike_reg_no,.errorShowbike_reg_no1,.errorShowbike_reg_year,.errorShowowner_deduction_owner_no,.errorShowkm_deduction_km,.errorShowbike_color,.errorShowbike_current_city,.errorShowbike_is_insurance {
+            display: none;
+        }
+        .box_contacts a {
+            color: #fff;
+        }
+    </style>
+@endpush
+@section('content')
+<main class="bg_gray">
+<div class="container margin_60">
+    <div class="main_title">
+        <h2>Check Price of Used Bikes</h2>
+        {{-- <p>Euismod phasellus ac lectus fusce parturient cubilia a nisi blandit sem cras nec tempor adipiscing rcu ullamcorper ligula.</p> --}}
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="box_contacts">
+                @if (session('message'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('message') }}
+                    </div>
+                @endif
+                @if (Cookie::get('model_name'))
+                    <a href="{{route('sell-confirm')}}" class="btn_1">Bike Sell Confirm</a>
+                    <button id="resetCookies" class="btn_1">Reset Value</button>
+                @else
+                    <form method="POST" class="forms-sample" action="{{ route('sell-bike.store') }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+                            {{-- <label for="model_name">Model Name</label> --}}
+                            <select class="form-control" name="bike_type" id="bike_type" required>
+                            {{-- <option value="">Select Type *</option> --}}
+                                {{-- @if (!$buyBikeDetails->isEmpty())
+                                    @foreach ($buyBikeDetails->unique('bike_type') as $brand)
+                                        <option value="{{$brand->bike_type}}">{{$brand->bike_type}}</option>
+                                    @endforeach                
+                                @endif --}}
+                                <option value="Bike" selected>Bike</option>
+                                <option value="Scooty">Scooty</option>
+                            </select>
+                        </div>
+                        @error('bike_type')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+                        <div class="form-group">
+                            {{-- <label for="model_name">Model Name</label> --}}
+                            <select class="form-control js-example-basic-single" name="model_name" id="model_name" required>
+                            </select>
+                        </div>
+                        <div class="errorShowModelName">
+                            <label class="errorq text-danger model_name" style="float:left;"></label><br>
+                        </div>
+                        
+                        @error('model_name')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+        
+                        <label class="regNo">Bike Registration Number</label>
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <input class="form-control" type="text" name="bike_reg_no" id="bike_reg_no" placeholder="Example: MH02 *" aria-label="MH02 " required>
+                                <div class="errorShowbike_reg_no">
+                                    <label class="errorq text-danger bike_reg_no" style="float:left;"></label><br>
+                                </div>
+                                @error('bike_reg_no')
+                                    <label class="error text-danger">{{ $message }}</label>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-sm-6">
+                                <input class="form-control" type="text" name="bike_reg_no1" id="bike_reg_no1" placeholder="Example: CL0555" aria-label="CL0555 ">
+                                <div class="errorShowbike_reg_no1">
+                                    <label class="errorq text-danger bike_reg_no1" style="float:left;"></label><br>
+                                </div>
+                                @error('bike_reg_no1')
+                                    <label class="error text-danger">{{ $message }}</label>
+                                @enderror
+                            </div>
+                        </div>
+        
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="bike_reg_year" name="bike_reg_year" placeholder="Bike Registration Year *" value="{{ old('bike_reg_year') }}" required>
+                        </div>
+                        @error('bike_reg_year')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+        
+                        <div class="errorShowbike_reg_year">
+                            <label class="errorq text-danger bike_reg_year" style="float:left;"></label><br>
+                        </div>
+        
+                        <div class="form-group">
+                            <select class="form-control" name="owner_deduction_owner_no" id="owner_deduction_owner_no" required>
+                            <option value="">Select No Of Owner *</option>
+                                @if (!$ownerDeductionRate->isEmpty())
+                                    @foreach ($ownerDeductionRate as $OwnerRate)
+                                        <option data-ownerrate="{{$OwnerRate->owner_deduction_rate}}" value="{{$OwnerRate->id}}">{{$OwnerRate->owner_deduction_owner_no}}</option>
+                                    @endforeach                
+                                @endif
+                            </select>
+                        </div>
+                        @error('owner_deduction_owner_no')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+                        <div class="errorShowowner_deduction_owner_no">
+                            <label class="errorq text-danger owner_deduction_owner_no" style="float:left;"></label><br>
+                        </div>
+        
+                        <div class="form-group">
+                            <select class="form-control" name="km_deduction_km" id="km_deduction_km" required>
+                            <option value="">Select KM *</option>
+                                @if (!$kmDeductionRate->isEmpty())
+                                    @foreach ($kmDeductionRate as $kmRate)
+                                        <option data-kmrate="{{$kmRate->km_deduction_rate}}" value="{{$kmRate->id}}">{{$kmRate->km_deduction_km_from}} To {{$kmRate->km_deduction_km_to}} km</option>
+                                    @endforeach                
+                                @endif
+                            </select>
+                        </div>
+                        @error('km_deduction_km')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+                        <div class="errorShowkm_deduction_km">
+                            <label class="errorq text-danger km_deduction_km" style="float:left;"></label><br>
+                        </div>
+        
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="bike_color" id="bike_color" placeholder="Bike Color *" aria-label="Bike Color " required>
+                        </div>
+                        @error('bike_color')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+                        <div class="errorShowbike_color">
+                            <label class="errorq text-danger bike_color" style="float:left;"></label><br>
+                        </div>
+        
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="bike_current_city" id="bike_current_city" placeholder="Bike Current City *" aria-label="Bike Current City " required>
+                        </div>
+                        @error('bike_current_city')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+        
+                        <div class="errorShowbike_current_city">
+                            <label class="errorq text-danger bike_current_city" style="float:left;"></label><br>
+                        </div>
+        
+                        <div class="form-group">
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="form-control file-upload-info" name="bike_image" id="bike_image">
+                            </div>
+                        </div>
+                        @error('bike_image')
+                            <label class="error text-danger">{{ $message }}</label><br>
+                        @enderror
+        
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label"><br>Is Insurance</label>
+                            <div class="col-sm-4">
+                            <div class="form-radio">
+                                <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="bike_is_insurance" id="IsInsurance11" value="Yes" checked="">
+                                Yes
+                                <i class="input-helper"></i></label>
+                            </div>
+                            </div>
+                            <div class="col-sm-5">
+                            <div class="form-radio">
+                                <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="bike_is_insurance" id="IsInsurance01" value="No" >
+                                No
+                                <i class="input-helper"></i></label>
+                            </div>
+                            </div>
+                        </div>
+                        @error('bike_is_insurance')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+                        <div class="errorShowbike_is_insurance">
+                            <label class="errorq text-danger bike_is_insurance" style="float:left;"></label><br>
+                        </div>
+                        {{-- InsuranceDeductionRate --}}
+                        <div class="form-group" id="InsuranceDeductionRateShow" style="display:none;">
+                            {{-- <label for="insurance_deduction_rate">RTO Insurance Fees List</label> --}}
+                            <select class="form-control" name="insurance_deduction_rate" id="insurance_deduction_rate">
+                            </select>
+                        </div> 
+                        @error('insurance_deduction_rate')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror            
+                        
+        
+                        <div class="box_cart" id="box_cart_cal" style="display:none;">
+                            <div class="container">
+                                <div class="row justify-content-end">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <ul>
+                                            <li>
+                                                <span>Estimated Price : </span> <h3 id="calTotalSellPrice">Rs. 00.00</h3>
+                                            </li>
+                                        </ul>
+                                        <input type="submit" value="Proceed to Next" class="btn_1 full-width">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+        
+                        <button class="btn_1" id="calculatePrice" type="button">Check Price</button>
+                    </form>
+                @endif
+                
+                
+            </div>
+        </div>
+    </div>
+    <!-- /row -->				
+</div>
+</main>
+@endsection
+
+@push('scripts')
+    <script src="{{ asset('admin_template/node_modules/select2/dist/js/select2.min.js')}}"></script>
+    <script src="{{ asset('admin_template/js/select2.js')}}"></script>
+    <script src="{{ asset('admin_template/node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')}}"></script>
+    
+    <script>
+        $(document).ready(function(){
+            $("#model_name").empty();
+            $("#model_name").append('<option value="">Select Bike Model *</option>');
+            $("#model_name").append('@if (!$buyBikeDetails->isEmpty()) @foreach ($buyBikeDetails->where("bike_type","Bike") as $buyBike) <option data-modelprice="{{$buyBike->base_price}}" value="{{$buyBike->id}}">{{ $buyBike->brand_name }} {{$buyBike->model_name }} {{$buyBike->model_cc }} {{$buyBike->bike_year }}</option> @endforeach @endif');
+        });
+    </script>
+    <script>
+        $(function(){
+            $("#bike_type").change(function(){
+                var BikeType = $(this).val();
+                // console.log(BikeType);
+                if(BikeType=='Bike'){
+                    $("#model_name").empty();
+                    $("#model_name").append('<option value="">Select Bike Model *</option>');
+                    $("#model_name").append('@if (!$buyBikeDetails->isEmpty()) @foreach ($buyBikeDetails->where("bike_type","Bike") as $buyBike) <option data-modelprice="{{$buyBike->base_price}}" value="{{$buyBike->id}}">{{ $buyBike->brand_name }} {{$buyBike->model_name }} {{$buyBike->model_cc }} {{$buyBike->bike_year }}</option> @endforeach @endif');
+                }else{
+                    $("#model_name").empty();
+                    $("#model_name").append('<option value="">Select Scooty Model *</option>');
+                    $("#model_name").append('@if (!$buyBikeDetails->isEmpty()) @foreach ($buyBikeDetails->where("bike_type","Scooty") as $buyBike) <option data-modelprice="{{$buyBike->base_price}}" value="{{$buyBike->id}}">{{ $buyBike->brand_name }} {{$buyBike->model_name }} {{$buyBike->model_cc }} {{$buyBike->bike_year }}</option> @endforeach @endif');
+                }
+            });
+        });
+
+        $('#bike_reg_year').datepicker({
+            endDate: 'today',
+            format:'yyyy',
+            viewMode: 'years',
+            minViewMode: 'years'
+        });
+        // is Insurance yes
+        $("input:radio[name='bike_is_insurance']").change(function(){
+                var IsInsurance = $(this).val();
+                // console.log(IsInsurance);
+                if (IsInsurance == 'No') {
+                    $('#InsuranceDeductionRateShow').show();
+                    $('#insurance_deduction_rate').prop('required',true);
+                    $("#insurance_deduction_rate").empty();
+                    $("#insurance_deduction_rate").append('<option value="">Select Insurance *</option>');
+                    $("#insurance_deduction_rate").append('@if (!$InsuranceDeductionRate->isEmpty()) @foreach ($InsuranceDeductionRate as $insurance) <option data-insuranceprice="{{$insurance->insurance_deduction_rate}}" value="{{$insurance->id}}">{{ $insurance->insurance_deduction_cc_from }} To {{$insurance->insurance_deduction_cc_to }} CC</option> @endforeach @endif');
+                } else {
+                    $('#InsuranceDeductionRateShow').hide();
+                    $("#insurance_deduction_rate").prop('selectedIndex',0);
+                    $('#insurance_deduction_rate').prop('required',false);
+                }
+            });
+        
+    </script>
+
+    <script>
+        $("#calculatePrice").click(function(){
+            var bike_type = $("#bike_type").val();
+            var model_name = $("#model_name").val();
+            var bike_reg_no = $("#bike_reg_no").val();
+            var bike_reg_no1 = $("#bike_reg_no1").val();
+            var bike_reg_year = $("#bike_reg_year").val();
+            var owner_deduction_owner_no = $("#owner_deduction_owner_no").val();
+            var km_deduction_km = $("#km_deduction_km").val();
+            var bike_color = $("#bike_color").val();
+            var bike_current_city = $("#bike_current_city").val();
+            var bike_is_insurance = $("input:radio[name='bike_is_insurance']:checked").val();
+            // console.log(bike_is_insurance);
+            var NowYear = new Date().getFullYear();
+            var bike_reg_year_cal = NowYear - bike_reg_year;
+            // console.log(bike_reg_year_cal);
+
+            if (model_name =='') {
+                $(".errorShowModelName").show();
+                $('#box_cart_cal').hide();
+                $(".model_name").text('Bike model name required');
+            } else if (bike_reg_no.length!=4) {
+                $(".errorShowbike_reg_no").show();
+                $('#box_cart_cal').hide();
+                $(".bike_reg_no").text('Length must be 4 digit ');
+            
+            // } else if (bike_reg_no1!='') {
+            //     // if (bike_reg_no1.length!=6) {
+                    
+            //     // }
+            //     $(".errorShowbike_reg_no1").show();
+            //         $('#box_cart_cal').hide();
+            //         $(".bike_reg_no1").text('length must be 6 digit');
+            } else if (bike_reg_year == '') {
+                $(".errorShowbike_reg_year").show();
+                $('#box_cart_cal').hide();
+                $(".bike_reg_year").text('required');
+            } else if (owner_deduction_owner_no == '') {
+                $(".errorShowowner_deduction_owner_no").show();
+                $('#box_cart_cal').hide();
+                $(".owner_deduction_owner_no").text('Owner no is required');
+            } else if (km_deduction_km == '') {
+                $(".errorShowkm_deduction_km").show();
+                $('#box_cart_cal').hide();
+                $(".km_deduction_km").text('KM is required');
+            } else if (bike_color == '') {
+                $(".errorShowbike_color").show();
+                $('#box_cart_cal').hide();
+                $(".bike_color").text('Bike color is required');
+            } else if (bike_current_city == '') {
+                $(".errorShowbike_current_city").show();
+                $('#box_cart_cal').hide();
+                $(".bike_current_city").text('Bike current city is required');
+            } else if (bike_is_insurance == 'No') {
+                var insurance_deduction_rate = $("#insurance_deduction_rate").val();
+                if (insurance_deduction_rate == '') {
+                    $(".errorShowbike_is_insurance").show();
+                    $('#box_cart_cal').hide();
+                    $(".bike_is_insurance").text('Bike insurance is required');
+                } else {
+                    var insuranceprice = $('#insurance_deduction_rate').find(':selected').data('insuranceprice');
+                    // console.log(insuranceprice);
+                    var model_amount = $('#model_name').find(':selected').data('modelprice');
+                    var ownerrate = $('#owner_deduction_owner_no').find(':selected').data('ownerrate');
+                    var kmrate = $('#km_deduction_km').find(':selected').data('kmrate');
+                    
+                    
+                    if (bike_reg_year_cal > 15) {
+                        var estimated_price_year = model_amount - ownerrate - insuranceprice;
+                    } else {
+                        var estimated_price_year = model_amount - (model_amount * kmrate / 100) - ownerrate - insuranceprice;
+                    }
+                    var estimated_price = estimated_price_year;
+                    $("#calTotalSellPrice").text('Rs. '+ estimated_price + '.00');
+                    // console.log(estimated_price);
+                    $(".errorShowbike_reg_no").hide();
+                    $(".errorShowModelName").hide();
+                    $(".errorShowbike_reg_no1").hide();
+                    $(".errorShowbike_reg_year").hide();
+                    $(".errorShowowner_deduction_owner_no").hide();
+                    $(".errorShowkm_deduction_km").hide();
+                    $(".errorShowbike_color").hide();
+                    $(".errorShowbike_current_city").hide();
+                    $(".errorShowbike_is_insurance").hide();
+                    $('#box_cart_cal').show();
+                }
+                
+            } else {
+                var model_amount = $('#model_name').find(':selected').data('modelprice');
+                var ownerrate = $('#owner_deduction_owner_no').find(':selected').data('ownerrate');
+                var kmrate = $('#km_deduction_km').find(':selected').data('kmrate');
+                
+                
+                if (bike_reg_year_cal > 15) {
+                    var estimated_price_year = model_amount - ownerrate;
+                } else {
+                    var estimated_price_year = model_amount - (model_amount * kmrate / 100) - ownerrate;
+                }
+                var estimated_price = estimated_price_year;
+                $("#calTotalSellPrice").text('Rs. '+ estimated_price + '.00');
+                // console.log(estimated_price);
+                $(".errorShowbike_reg_no").hide();
+                $(".errorShowModelName").hide();
+                $(".errorShowbike_reg_no1").hide();
+                $(".errorShowbike_reg_year").hide();
+                $(".errorShowowner_deduction_owner_no").hide();
+                $(".errorShowkm_deduction_km").hide();
+                $(".errorShowbike_color").hide();
+                $(".errorShowbike_current_city").hide();
+                $(".errorShowbike_is_insurance").hide();
+                $('#box_cart_cal').show();
+            }
+        });
+        
+    </script>
+    <script>        
+        $("#resetCookies").click(function(){
+            $.ajax({
+                type: "GET",
+                url: '{{ route('resetCookies') }}',
+                success: function(){
+                    window.location = '{{ route('sell-bike.index') }}';
+                }
+            });
+        });
+    </script>
+@endpush

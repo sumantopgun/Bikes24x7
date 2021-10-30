@@ -1,0 +1,77 @@
+@extends('superadmin.layout')
+@section('title', 'Collection Point Edit')
+@section('content')
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                    <center><h4 class="card-title">Edit Collection Point</h4></center>
+                    <form method="POST" class="forms-sample" action="{{ route('superadmin.collection-point.update', $point->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <div class="form-group">
+                            <label for="shop_name">Collection Point Name</label>
+                            <input type="text" class="form-control" id="shop_name" name="shop_name" placeholder="Collection Point Name" value="{{ $point->shop_name }}" required>
+                        </div>
+                        @error('shop_name')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+                        
+                        <div class="form-group">
+                            <label for="shop_location">Location</label>
+                            <textarea class="form-control" required id="shop_location" name="shop_location" rows="3">{{ $point->shop_location }}</textarea>
+                        </div>
+                        @error('shop_location')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+
+                        <div class="form-group">
+                            <label for="contact_no">Contact No</label>
+                            <input type="number" class="form-control" id="contact_no" name="contact_no" value="{{ $point->contact_no }}" placeholder="Contact No" required>
+                        </div>
+                        @error('contact_no')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+
+                        
+                        <div class="form-group">
+                            <label for="city_id">City</label>
+                            <select class="form-control" name="city_id" required>
+                              <option value="">Select City</option>
+                                @if (!$cities->isEmpty())
+                                    @foreach ($cities as $city)
+                                        @if($point->city_id==$city->id)
+                                            <option selected value="{{$city->id}}">{{$city->city_name}}</option>
+                                        @elseif($point->city_id!==$city->id)
+                                            <option value="{{$city->id}}">{{$city->city_name}}</option>
+                                        @endif
+                                    @endforeach                
+                                @endif
+                            </select>
+                        </div>
+                        @error('city_id')
+                            <label class="error text-danger">{{ $message }}</label>
+                        @enderror
+
+                        {{-- <div class="form-group">
+                            <label for="shop_type">Shop Type</label>
+                            <select class="form-control" name="shop_type" required>
+                              <option value="">Shop Type</option>
+                              <option value="showrooms" {{ $shop->shop_type=='showrooms' ? 'selected' : ''}}>Showrooms</option>
+                              <option value="workshop" {{ $shop->shop_type=='workshop' ? 'selected' : ''}}>Workshop</option>
+                              <option value="collection_points" {{ $shop->shop_type=='collection_points' ? 'selected' : ''}}>Collection Points</option>
+                            </select>
+                        </div>
+                        @error('shop_type')
+                            <label class="error text-danger">{{ $message }}</label><br>
+                        @enderror --}}
+
+                        <button type="submit" class="btn btn-success mr-2">Update</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
